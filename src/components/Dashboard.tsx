@@ -2133,8 +2133,8 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
                           </span>
                           <span className={cn(
                             "text-sm font-bold",
-                            confidence >= 90 ? "text-green-400" :
-                            confidence >= 75 ? "text-yellow-400" : "text-red-400"
+                            (confidence as number) >= 90 ? "text-green-400" :
+                            (confidence as number) >= 75 ? "text-yellow-400" : "text-red-400"
                           )}>
                             {confidence}%
                           </span>
@@ -2143,14 +2143,14 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
                           <div 
                             className={cn(
                               "h-2 rounded-full transition-all duration-300",
-                              confidence >= 90 ? "bg-green-500" :
-                              confidence >= 75 ? "bg-yellow-500" : "bg-red-500"
+                              (confidence as number) >= 90 ? "bg-green-500" :
+                              (confidence as number) >= 75 ? "bg-yellow-500" : "bg-red-500"
                             )}
                             style={{ width: `${confidence}%` }}
                           />
                         </div>
                         <p className="text-xs text-slate-400 mt-1">
-                          Based on {Math.floor(confidence / 10)} successful operations
+                          Based on {Math.floor((confidence as number) / 10)} successful operations
                         </p>
                       </div>
                     ))}

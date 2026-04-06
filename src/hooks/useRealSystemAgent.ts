@@ -239,7 +239,7 @@ export function useRealSystemAgent(deviceId: string | null, userId: string) {
       const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
       
       if (gl) {
-        const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+        const debugInfo = (gl as WebGLRenderingContext).getExtension('WEBGL_debug_renderer_info');
         if (debugInfo) {
           // Estimate GPU usage based on WebGL context
           return Math.random() * 30 + 10; // 10-40%

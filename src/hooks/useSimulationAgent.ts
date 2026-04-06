@@ -405,7 +405,7 @@ export function useSimulationAgent(deviceId: string | null, userId: string) {
 
         // 🏆 TREND ANALYSIS & HEALTH SCORE CALCULATION
         analyzeTrends(newCpu, newMem);
-        const healthScore = calculateSystemHealth(newCpu, newMem, currentProcesses.length);
+        const healthScore = calculateSystemHealth(newCpu, newMem, processesRef.current.length);
 
         // Update processes with realistic CPU usage and ensure variety
         setProcesses(prev => {
