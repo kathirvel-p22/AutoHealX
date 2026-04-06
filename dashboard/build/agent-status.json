@@ -3,8 +3,17 @@
   "mode": "suggestion",
   "monitoring": true,
   "version": "2.0.0",
-  "cycleCount": 15,
-  "timestamp": 1775137987174,
-  "lastMetrics": null,
-  "lastHeartbeat": "2026-04-02T13:53:07.174Z"
+  "cycleCount": 25,
+  "deviceId": "demo-device-123",
+  "hostname": "KATHIRVEL",
+  "platform": "win32",
+  "isRegistered": true,
+  "lastMetrics": {
+    "cpu": 23,
+    "memory": 86.8,
+    "processCount": 288,
+    "topProcess": "System"
+  },
+  "timestamp": 1775307289208,
+  "lastHeartbeat": "2026-04-04T12:54:49.208Z"
 }

@@ -123,11 +123,11 @@ export function useAgentStatus(isAuthenticated = true) {
     // Initial fetch
     fetchAgentStatus();
 
-    // Set up smooth polling (every 15 seconds for professional feel)
+    // Set up smooth polling (every 20 seconds for professional feel)
     intervalId = setInterval(() => {
-      console.log(`[${new Date().toLocaleTimeString()}] 🔄 15-second refresh cycle - Fetching agent status...`);
+      console.log(`[${new Date().toLocaleTimeString()}] 🔄 20-second refresh cycle - Fetching agent status...`);
       fetchAgentStatus();
-    }, 15000);
+    }, 20000);
 
     return () => {
       if (intervalId) {
@@ -215,11 +215,11 @@ export function useMetrics(limitCount = 50, isAuthenticated = true) {
     // Initial fetch
     fetchMetrics();
 
-    // Set up smooth polling (every 15 seconds for professional feel)
+    // Set up smooth polling (every 20 seconds for professional feel)
     intervalId = setInterval(() => {
-      console.log(`[${new Date().toLocaleTimeString()}] 📊 15-second refresh cycle - Fetching metrics...`);
+      console.log(`[${new Date().toLocaleTimeString()}] 📊 20-second refresh cycle - Fetching metrics...`);
       fetchMetrics();
-    }, 15000);
+    }, 20000);
 
     return () => {
       if (intervalId) {
@@ -267,8 +267,8 @@ export function useAlerts(limitCount = 20, isAuthenticated = true) {
     // Initial fetch
     fetchAlerts();
 
-    // Set up polling (every 15 seconds)
-    const intervalId = setInterval(fetchAlerts, 15000);
+    // Set up polling (every 20 seconds)
+    const intervalId = setInterval(fetchAlerts, 20000);
 
     return () => clearInterval(intervalId);
   }, [limitCount, isAuthenticated]); // Add isAuthenticated to dependencies
@@ -308,8 +308,8 @@ export function useFixLogs(limitCount = 20, isAuthenticated = true) {
     // Initial fetch
     fetchFixLogs();
 
-    // Set up polling (every 15 seconds)
-    const intervalId = setInterval(fetchFixLogs, 15000);
+    // Set up polling (every 20 seconds)
+    const intervalId = setInterval(fetchFixLogs, 20000);
 
     return () => clearInterval(intervalId);
   }, [limitCount, isAuthenticated]); // Add isAuthenticated to dependencies
@@ -348,8 +348,8 @@ export function useKnowledge(isAuthenticated = true) {
     // Initial fetch
     fetchKnowledge();
 
-    // Set up polling (every 15 seconds)
-    const intervalId = setInterval(fetchKnowledge, 15000);
+    // Set up polling (every 20 seconds)
+    const intervalId = setInterval(fetchKnowledge, 20000);
 
     return () => clearInterval(intervalId);
   }, [isAuthenticated]); // Add isAuthenticated to dependencies
@@ -390,8 +390,8 @@ export function usePendingActions(isAuthenticated = true) {
     // Initial fetch
     fetchPendingActions();
 
-    // Set up polling (every 15 seconds to match agent cycles)
-    const intervalId = setInterval(fetchPendingActions, 15000);
+    // Set up polling (every 20 seconds to match agent cycles)
+    const intervalId = setInterval(fetchPendingActions, 20000);
 
     return () => clearInterval(intervalId);
   }, [isAuthenticated]); // Add isAuthenticated to dependencies

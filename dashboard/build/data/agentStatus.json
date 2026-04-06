@@ -1,10 +1,19 @@
 {
   "status": "online",
   "mode": "suggestion",
-  "monitoring": false,
+  "monitoring": true,
   "version": "2.0.0",
-  "startedAt": "2026-04-01T13:05:44.016Z",
-  "lastHeartbeat": "2026-04-01T13:05:44.018Z",
-  "timestamp": 1775048744018,
-  "lastUpdate": 1775048744018
+  "cycleCount": 25,
+  "deviceId": "demo-device-123",
+  "hostname": "KATHIRVEL",
+  "platform": "win32",
+  "isRegistered": true,
+  "lastMetrics": {
+    "cpu": 23,
+    "memory": 86.8,
+    "processCount": 288,
+    "topProcess": "System"
+  },
+  "timestamp": 1775307289208,
+  "lastHeartbeat": "2026-04-04T12:54:49.208Z"
 }

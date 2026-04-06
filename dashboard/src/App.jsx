@@ -12,6 +12,7 @@ import SimpleLoginPage from './components/SimpleLoginPage';
 import UserProfile from './components/UserProfile';
 import EnhancedSystemGraph from './components/EnhancedSystemGraph';
 import DynamicHardwareGraphs from './components/DynamicHardwareGraphs';
+import SystemOverviewPanel from './components/SystemOverviewPanel';
 import AlertPanel from './components/AlertPanel';
 import FixHistory from './components/FixHistory';
 import KnowledgePanel from './components/KnowledgePanel';
@@ -400,79 +401,75 @@ const Dashboard = memo(function Dashboard() {
             </div>
           ) : (
             <>
-              {/* System Overview with Selected Device Info */}
-              <div className="dashboard-header-enhanced">
-                <div className="selected-device-banner">
-                  <div className="device-banner-icon">💻</div>
-                  <div className="device-banner-info">
-                    <h2>Monitoring: {selectedDevice.deviceName}</h2>
-                    <p>{selectedDevice.hostname} | {selectedDevice.platform} | 
-                      <span style={{color: getDeviceStatusColor()}}>● {getAgentStatusText()}</span>
-                    </p>
-                  </div>
-                  <div className="device-banner-metrics">
-                    <div className="banner-metric">
-                      <span className="banner-metric-label">CPU</span>
-                      <span className="banner-metric-value">{selectedDevice.lastMetrics?.cpu || 0}%</span>
-                    </div>
-                    <div className="banner-metric">
-                      <span className="banner-metric-label">Memory</span>
-                      <span className="banner-metric-value">{selectedDevice.lastMetrics?.memory || 0}%</span>
-                    </div>
-                    <div className="banner-metric">
-                      <span className="banner-metric-label">Processes</span>
-                      <span className="banner-metric-value">{selectedDevice.lastMetrics?.processCount || 0}</span>
-                    </div>
+              {/* Metric Cards Row */}
+              <div className="metrics-row">
+                <div className="metric-card-small">
+                  <div className="metric-icon-small">�️</div>
+                  <div className="metric-value-small">{latest?.cpu?.toFixed(2) || 0}%</div>
+                  <div className="metric-label-small">CPU USAGE</div>
+                  <div className="metric-bar">
+                    <div className="metric-fill" style={{ width: `${Math.min(latest?.cpu || 0, 100)}%`, background: (latest?.cpu || 0) > 80 ? '#ef4444' : (latest?.cpu || 0) > 60 ? '#f59e0b' : '#22c55e' }}></div>
                   </div>
                 </div>
-                
-                <div className="dashboard-controls">
-                  <div className="stability-indicator">
-                    <span className="stability-dot" style={{ 
-                      backgroundColor: isStable ? '#22c55e' : '#f59e0b' 
-                    }}></span>
-                    <span className="stability-text">
-                      {isStable ? 'Stable' : 'Loading...'}
-                    </span>
+                <div className="metric-card-small">
+                  <div className="metric-icon-small">💾</div>
+                  <div className="metric-value-small">{latest?.memory?.toFixed(2) || 0}%</div>
+                  <div className="metric-label-small">MEMORY USAGE</div>
+                  <div className="metric-bar">
+                    <div className="metric-fill" style={{ width: `${Math.min(latest?.memory || 0, 100)}%`, background: (latest?.memory || 0) > 85 ? '#ef4444' : (latest?.memory || 0) > 70 ? '#f59e0b' : '#22c55e' }}></div>
                   </div>
-                  
-                  <div className="refresh-indicator">
-                    <span className="refresh-label">Last Update:</span>
-                    <span className="refresh-time">{lastRefresh.toLocaleTimeString()}</span>
+                </div>
+                <div className="metric-card-small">
+                  <div className="metric-icon-small">⚙️</div>
+                  <div className="metric-value-small">{latest?.processCount || 0}</div>
+                  <div className="metric-label-small">ACTIVE PROCESSES</div>
+                  <div className="metric-bar">
+                    <div className="metric-fill" style={{ width: `${Math.min((latest?.processCount || 0) / 4, 100)}%`, background: '#22c55e' }}></div>
                   </div>
-                  
-                  <div className="view-toggle">
-                    <button 
-                      className={`toggle-btn ${!showComprehensive ? 'active' : ''}`}
-                      onClick={() => setShowComprehensive(false)}
-                    >
-                      Simple
-                    </button>
-                    <button 
-                      className={`toggle-btn ${showComprehensive ? 'active' : ''}`}
-                      onClick={() => setShowComprehensive(true)}
-                    >
-                      Comprehensive
-                    </button>
+                </div>
+                <div className="metric-card-small">
+                  <div className="metric-icon-small">🚨</div>
+                  <div className="metric-value-small">{alerts?.filter(a => !a.resolved).length || 0}</div>
+                  <div className="metric-label-small">ALERTS ACTIVE</div>
+                  <div className="metric-bar">
+                    <div className="metric-fill" style={{ width: `${Math.min((alerts?.filter(a => !a.resolved).length || 0) * 20, 100)}%`, background: (alerts?.filter(a => !a.resolved).length || 0) > 0 ? '#f59e0b' : '#22c55e' }}></div>
                   </div>
+                </div>
+                <div className="metric-card-small">
+                  <div className="metric-icon-small">✅</div>
+                  <div className="metric-value-small">{fixLogs?.length || 0}</div>
+                  <div className="metric-label-small">FIXES APPLIED</div>
+                  <div className="metric-bar">
+                    <div className="metric-fill" style={{ width: `${Math.min((fixLogs?.length || 0) * 10, 100)}%`, background: '#22c55e' }}></div>
+                  </div>
+                </div>
+                <div className="metric-card-small">
+                  <div className="metric-icon-small">🧠</div>
+                  <div className="metric-value-small">{knowledge?.length || 0}</div>
+                  <div className="metric-label-small">PATTERNS LEARNED</div>
+                  <div className="metric-bar">
+                    <div className="metric-fill" style={{ width: `${Math.min((knowledge?.length || 0) * 20, 100)}%`, background: '#8b5cf6' }}></div>
+                  </div>
+                </div>
+              </div>
 
-                  <div className="agent-status">
-                    <span className="status-label">Agent:</span>
-                    <span className={`status-value ${agentStatus?.status || 'online'}`}>
-                      {getAgentStatusText()}
-                    </span>
-                  </div>
-                  
-                  <div className="mode-toggle">
-                    <span className="mode-label">Mode:</span>
-                    <button 
-                      className={`mode-btn ${agentStatus?.mode || 'suggestion'}`}
-                      onClick={handleModeToggle}
-                      disabled={agentStatus?.status !== 'online'}
-                    >
-                      {agentStatus?.mode === 'autonomous' ? '🤖 Autonomous' : '💡 Suggestion'}
-                    </button>
-                  </div>
+              {/* Agent Status Bar */}
+              <div className="agent-status-bar">
+                <div className="status-item">
+                  <span className="status-label-bar">Agent:</span>
+                  <span className={`status-value-bar ${agentStatus?.status === 'online' ? 'online' : 'offline'}`}>
+                    {agentStatus?.status === 'online' ? 'Online' : 'Offline'}
+                  </span>
+                </div>
+                <div className="status-divider">|</div>
+                <div className="status-item">
+                  <span className="status-label-bar">Mode:</span>
+                  <span className="status-value-bar mode">{agentStatus?.mode === 'autonomous' ? 'AUTONOMOUS' : 'SUGGESTION'}</span>
+                </div>
+                <div className="status-divider">|</div>
+                <div className="status-item">
+                  <span className="status-label-bar">Cycles:</span>
+                  <span className="status-value-bar">{agentStatus?.cycleCount || 0}</span>
                 </div>
               </div>
 
@@ -498,22 +495,27 @@ const Dashboard = memo(function Dashboard() {
                     </div>
                     <div className="dashboard-row">
                       <div className="dashboard-col-6">
-                        <EnhancedSystemGraph latest={latest} metrics={metrics} />
+                        <EnhancedSystemGraph latest={latest} metrics={metrics} agentStatus={agentStatus} />
                       </div>
                       <div className="dashboard-col-6">
-                        <DynamicHardwareGraphs latest={latest} metrics={metrics} />
+                        <SystemOverviewPanel latest={latest} metrics={metrics} />
                       </div>
                     </div>
                   </div>
                 ) : (
                   <div className="simple-dashboard">
+                    {/* Main Metrics Row */}
                     <div className="dashboard-grid">
                       <div className="grid-item large">
-                        <EnhancedSystemGraph latest={latest} metrics={metrics} />
+                        <EnhancedSystemGraph latest={latest} metrics={metrics} agentStatus={agentStatus} />
                       </div>
                       <div className="grid-item large">
-                        <DynamicHardwareGraphs latest={latest} metrics={metrics} />
+                        <SystemOverviewPanel latest={latest} metrics={metrics} />
                       </div>
+                    </div>
+                    
+                    {/* Alerts & Intelligence Row */}
+                    <div className="dashboard-grid">
                       <div className="grid-item medium">
                         <AlertPanel alerts={alerts} />
                       </div>

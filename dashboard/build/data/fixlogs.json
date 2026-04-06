@@ -1,5 +1,44 @@
 [
   {
+    "issueType": "INTELLIGENT_MEMORY_ACTION",
+    "severity": "warning",
+    "action": "rejected",
+    "mode": "manual",
+    "success": false,
+    "skipped": true,
+    "message": "Intelligent action rejected by user: timeout",
+    "explanation": "Memory consumption at 89.6% and increasing by 1.2666666666666657%/min. Terminating memory-intensive process prevents system instability and potential data loss.",
+    "confidence": 95,
+    "timestamp": "2026-04-03T18:09:06.145Z",
+    "id": "fix_1775239746145_xwy0heu5y"
+  },
+  {
+    "issueType": "INTELLIGENT_MEMORY_ACTION",
+    "severity": "warning",
+    "action": "rejected",
+    "mode": "manual",
+    "success": false,
+    "skipped": true,
+    "message": "Intelligent action rejected by user: timeout",
+    "explanation": "Memory consumption at 87.5% and increasing by 1.0666666666666675%/min. Terminating memory-intensive process prevents system instability and potential data loss.",
+    "confidence": 95,
+    "timestamp": "2026-04-03T18:08:39.149Z",
+    "id": "fix_1775239719149_whoudr6er"
+  },
+  {
+    "issueType": "INTELLIGENT_MEMORY_ACTION",
+    "severity": "warning",
+    "action": "rejected",
+    "mode": "manual",
+    "success": false,
+    "skipped": true,
+    "message": "Intelligent action rejected by user: timeout",
+    "explanation": "Memory consumption at 86.4% and increasing by 1.5333333333333314%/min. Terminating memory-intensive process prevents system instability and potential data loss.",
+    "confidence": 95,
+    "timestamp": "2026-04-03T18:08:21.180Z",
+    "id": "fix_1775239701180_jrj7p94sp"
+  },
+  {
     "issueType": "MEMORY_OVERLOAD",
     "severity": "critical",
     "action": "rejected",

@@ -1,0 +1,95 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile information.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "user"] }
+      },
+      "required": ["uid", "email"]
+    },
+    "Device": {
+      "title": "Device",
+      "description": "Monitored device information.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "status": { "type": "string", "enum": ["active", "inactive", "warning"] },
+        "lastSeen": { "type": "string", "format": "date-time" },
+        "userId": { "type": "string" }
+      },
+      "required": ["id", "name", "userId"]
+    },
+    "Metric": {
+      "title": "Metric",
+      "description": "System performance metrics.",
+      "type": "object",
+      "properties": {
+        "deviceId": { "type": "string" },
+        "cpu": { "type": "number" },
+        "memory": { "type": "number" },
+        "disk": { "type": "number" },
+        "network": { "type": "number" },
+        "gpu": { "type": "number" },
+        "wifi": { "type": "number" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["deviceId", "cpu", "memory", "disk", "network", "gpu", "wifi", "timestamp"]
+    },
+    "Alert": {
+      "title": "Alert",
+      "description": "System alerts and issues.",
+      "type": "object",
+      "properties": {
+        "deviceId": { "type": "string" },
+        "type": { "type": "string", "enum": ["HIGH_CPU", "HIGH_MEMORY", "TREND_OVERLOAD"] },
+        "message": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "resolved"] },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "actionTaken": { "type": "string" }
+      },
+      "required": ["deviceId", "type", "status", "timestamp"]
+    },
+    "Command": {
+      "title": "Command",
+      "description": "Remote commands for the agent.",
+      "type": "object",
+      "properties": {
+        "deviceId": { "type": "string" },
+        "action": { "type": "string", "enum": ["KILL_PROCESS", "RESTART_SERVICE", "CLEAN_CACHE", "STRESS_TEST"] },
+        "target": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "done"] },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["deviceId", "action", "status", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profile documents."
+    },
+    "/devices/{deviceId}": {
+      "schema": "Device",
+      "description": "Device registry."
+    },
+    "/devices/{deviceId}/metrics/{metricId}": {
+      "schema": "Metric",
+      "description": "Real-time metrics for a device."
+    },
+    "/devices/{deviceId}/alerts/{alertId}": {
+      "schema": "Alert",
+      "description": "Alert history for a device."
+    },
+    "/devices/{deviceId}/commands/{commandId}": {
+      "schema": "Command",
+      "description": "Pending and completed commands for a device."
+    }
+  }
+}

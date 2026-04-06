@@ -1,0 +1,231 @@
+/* 🏆 AutoHealX Theme System - Light & Dark Mode */
+
+/* Light Theme Variables */
+.theme-light {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --bg-tertiary: #f1f5f9;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-tertiary: #64748b;
+  --border-primary: #e2e8f0;
+  --border-secondary: #cbd5e1;
+  --accent-primary: #3b82f6;
+  --accent-secondary: #8b5cf6;
+}
+
+/* Dark Theme Variables */
+.theme-dark {
+  --bg-primary: #020617;
+  --bg-secondary: #0f172a;
+  --bg-tertiary: #1e293b;
+  --text-primary: #ffffff;
+  --text-secondary: #cbd5e1;
+  --text-tertiary: #64748b;
+  --border-primary: rgba(255, 255, 255, 0.05);
+  --border-secondary: rgba(255, 255, 255, 0.1);
+  --accent-primary: #3b82f6;
+  --accent-secondary: #8b5cf6;
+}
+
+/* Light Theme Overrides */
+.light-theme {
+  /* Cards and Panels */
+  .bento-card {
+    @apply bg-white border-slate-200 shadow-sm;
+  }
+  
+  .glass-card {
+    @apply bg-white/80 border-slate-200 backdrop-blur-sm;
+  }
+  
+  /* Navigation */
+  .nav-tab-active {
+    @apply bg-brand-blue text-white;
+  }
+  
+  .nav-tab-inactive {
+    @apply text-slate-600 hover:text-slate-900 hover:bg-slate-100;
+  }
+  
+  /* Text Colors */
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-slate-900;
+  }
+  
+  p {
+    @apply text-slate-600;
+  }
+  
+  .text-white {
+    @apply text-slate-900;
+  }
+  
+  .text-slate-200 {
+    @apply text-slate-700;
+  }
+  
+  .text-slate-300 {
+    @apply text-slate-600;
+  }
+  
+  .text-slate-400 {
+    @apply text-slate-500;
+  }
+  
+  .text-slate-500 {
+    @apply text-slate-600;
+  }
+  
+  /* Backgrounds */
+  .bg-white\/5 {
+    @apply bg-slate-100;
+  }
+  
+  .bg-white\/10 {
+    @apply bg-slate-200;
+  }
+  
+  .bg-slate-700\/30 {
+    @apply bg-slate-100;
+  }
+  
+  .bg-slate-800 {
+    @apply bg-slate-200;
+  }
+  
+  .bg-slate-900 {
+    @apply bg-slate-100;
+  }
+  
+  /* Borders */
+  .border-white\/5 {
+    @apply border-slate-200;
+  }
+  
+  .border-white\/10 {
+    @apply border-slate-300;
+  }
+  
+  .border-slate-600 {
+    @apply border-slate-300;
+  }
+  
+  .border-slate-800 {
+    @apply border-slate-200;
+  }
+  
+  /* Input Fields */
+  input, textarea, select {
+    @apply bg-white border-slate-300 text-slate-900 placeholder-slate-500;
+  }
+  
+  input:focus, textarea:focus, select:focus {
+    @apply border-brand-blue ring-brand-blue/20;
+  }
+  
+  /* Buttons */
+  .btn-primary {
+    @apply bg-brand-blue text-white hover:bg-brand-blue/90;
+  }
+  
+  .btn-secondary {
+    @apply bg-slate-100 text-slate-900 hover:bg-slate-200 border-slate-300;
+  }
+  
+  /* Alerts and Notifications */
+  .alert-success {
+    @apply bg-green-50 border-green-200 text-green-800;
+  }
+  
+  .alert-error {
+    @apply bg-red-50 border-red-200 text-red-800;
+  }
+  
+  .alert-warning {
+    @apply bg-yellow-50 border-yellow-200 text-yellow-800;
+  }
+  
+  /* Charts and Graphs */
+  .chart-grid {
+    stroke: rgba(0, 0, 0, 0.1);
+  }
+  
+  .chart-text {
+    fill: #475569;
+  }
+  
+  /* Scrollbars */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-slate-100;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-slate-300 rounded-full;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-slate-400;
+  }
+}
+
+/* Dark Theme Styles (Default) */
+.dark-theme {
+  /* Keep existing dark theme styles */
+  .bento-card {
+    @apply bg-white/5 border-white/10;
+  }
+  
+  .glass-card {
+    @apply bg-white/5 border-white/10 backdrop-blur-xl;
+  }
+  
+  .nav-tab-active {
+    @apply bg-brand-blue text-white;
+  }
+  
+  .nav-tab-inactive {
+    @apply text-slate-400 hover:text-white hover:bg-white/5;
+  }
+  
+  /* Scrollbars */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-slate-800;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-slate-600 rounded-full;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-slate-500;
+  }
+}
+
+/* Smooth transitions for theme switching */
+* {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+/* Theme-specific animations */
+.theme-transition {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Light theme specific gradients */
+.light-theme .gradient-bg {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+}
+
+/* Dark theme specific gradients */
+.dark-theme .gradient-bg {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+}

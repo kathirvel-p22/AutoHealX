@@ -5,7 +5,7 @@
 
 const { spawn } = require('child_process');
 const path = require('path');
-const chalk = require('chalk');
+const chalk = require('chalk').default || require('chalk');
 
 console.log(chalk.cyan('\n╔══════════════════════════════════════════╗'));
 console.log(chalk.cyan('║') + chalk.bold.white('        AutoHealX System Launcher        ') + chalk.cyan('║'));

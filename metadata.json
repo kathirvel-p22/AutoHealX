@@ -1,0 +1,5 @@
+{
+  "name": "AutoHealX",
+  "description": "Real-time autonomous system monitoring and self-healing dashboard with automated issue detection and resolution.",
+  "requestFramePermissions": []
+}
