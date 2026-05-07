@@ -1,0 +1,105 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile and role information",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "developer", "viewer", "security"] },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
+        "displayName": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "role", "status"]
+    },
+    "Incident": {
+      "title": "Incident",
+      "description": "A detected system anomaly or error",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "serviceName": { "type": "string" },
+        "severity": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+        "status": { "type": "string", "enum": ["open", "investigating", "resolved", "dismissed"] },
+        "message": { "type": "string" },
+        "rootCause": { "type": "string" },
+        "confidence": { "type": "number" },
+        "suggestedFix": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "signature": { "type": "string" }
+      },
+      "required": ["id", "serviceName", "severity", "status", "message", "createdAt"]
+    },
+    "Action": {
+      "title": "Action",
+      "description": "An action taken in response to an incident",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "incidentId": { "type": "string" },
+        "type": { "type": "string" },
+        "riskLevel": { "type": "string", "enum": ["low", "medium", "high"] },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected", "executed", "failed"] },
+        "approvedBy": { "type": "string" },
+        "executionLogs": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "signature": { "type": "string" }
+      },
+      "required": ["id", "incidentId", "type", "riskLevel", "status", "createdAt"]
+    },
+    "Log": {
+      "title": "Log",
+      "description": "Raw system log entry",
+      "type": "object",
+      "properties": {
+        "timestamp": { "type": "string", "format": "date-time" },
+        "service": { "type": "string" },
+        "level": { "type": "string" },
+        "message": { "type": "string" },
+        "metadata": { "type": "object" }
+      },
+      "required": ["timestamp", "service", "level", "message"]
+    },
+    "AccessRequest": {
+      "title": "Access Request",
+      "description": "A request for a new user account",
+      "type": "object",
+      "properties": {
+        "firstName": { "type": "string" },
+        "lastName": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string" },
+        "publicKey": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["firstName", "lastName", "email", "role", "status", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profiles"
+    },
+    "/incidents/{incidentId}": {
+      "schema": "Incident",
+      "description": "Detected incidents"
+    },
+    "/incidents/{incidentId}/actions/{actionId}": {
+      "schema": "Action",
+      "description": "Actions related to an incident"
+    },
+    "/logs/{logId}": {
+      "schema": "Log",
+      "description": "System ingestion logs"
+    },
+    "/access-requests/{requestId}": {
+      "schema": "AccessRequest",
+      "description": "Requests for user access"
+    }
+  }
+}

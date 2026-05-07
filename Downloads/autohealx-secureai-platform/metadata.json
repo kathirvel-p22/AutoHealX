@@ -1,0 +1,6 @@
+{
+  "name": "AutoHealX SecureAI Platform",
+  "description": "Secure, AI-driven incident response and self-healing system with real-time monitoring and cryptographic audit logs.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["AI Analysis", "Real-time Monitoring", "Incident Response"]
+}

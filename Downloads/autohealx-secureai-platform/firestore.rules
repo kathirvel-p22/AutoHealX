@@ -1,0 +1,11 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // SECURITY WARNING: In this local auth mode, we are allowing open access to bypass Firebase Auth configuration issues.
+    // In production, you must use request.auth and enable providers in the Firebase Console.
+    
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}
