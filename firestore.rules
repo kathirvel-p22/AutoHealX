@@ -1,0 +1,172 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users
+    // Document ID: {userId}
+    // Fields:
+    //   - uid: string (required)
+    //   - email: string (required, email format)
+    //   - displayName: string (optional)
+    //   - photoURL: string (optional)
+    //   - role: string (required, 'admin' | 'user')
+    //
+    // Collection: devices
+    // Document ID: {deviceId}
+    // Fields:
+    //   - id: string (required)
+    //   - name: string (required, max 50 chars)
+    //   - status: string (required, 'active' | 'inactive' | 'warning')
+    //   - lastSeen: string (required, ISO 8601)
+    //   - userId: string (required, immutable)
+    //
+    // Collection: devices/{deviceId}/metrics
+    // Fields:
+    //   - deviceId: string (required, must match parent)
+    //   - cpu: number (required, 0-100)
+    //   - memory: number (required, 0-100)
+    //   - disk: number (required, 0-100)
+    //   - network: number (required, positive)
+    //   - timestamp: timestamp (required)
+    //
+    // [Repeat for alerts and commands...]
+    //
+    // ===============================================================
+
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && (
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin') ||
+        (request.auth.token.email == "kathirvel.p2006@gmail.com" && request.auth.token.email_verified == true)
+      );
+    }
+
+    function isDeviceOwner(deviceId) {
+      return isAuthenticated() && 
+             exists(/databases/$(database)/documents/devices/$(deviceId)) &&
+             get(/databases/$(database)/documents/devices/$(deviceId)).data.userId == request.auth.uid;
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    function isValidEmail(email) {
+      return email is string && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    }
+
+    // Domain Validators
+    function isValidUser(data) {
+      return hasOnlyAllowedFields(['uid', 'email', 'displayName', 'photoURL', 'role', 'createdAt']) &&
+             data.uid == request.auth.uid &&
+             isValidEmail(data.email) &&
+             data.role in ['admin', 'user'];
+    }
+
+    function isValidDevice(data) {
+      return hasOnlyAllowedFields(['id', 'name', 'status', 'lastSeen', 'userId', 'mode']) &&
+             data.id is string && data.id.size() > 0 && data.id.size() <= 50 &&
+             data.name is string && data.name.size() > 0 && data.name.size() <= 50 &&
+             data.status in ['active', 'inactive', 'warning'] &&
+             (!('mode' in data) || data.mode in ['suggest', 'auto']) &&
+             data.userId is string;
+    }
+
+    function isValidMetric(data, deviceId) {
+      return hasOnlyAllowedFields(['deviceId', 'cpu', 'memory', 'disk', 'network', 'gpu', 'wifi', 'timestamp']) &&
+             data.deviceId == deviceId &&
+             data.cpu is number && data.cpu >= 0 && data.cpu <= 100 &&
+             data.memory is number && data.memory >= 0 && data.memory <= 100 &&
+             data.disk is number && data.disk >= 0 && data.disk <= 100 &&
+             data.gpu is number && data.gpu >= 0 && data.gpu <= 100 &&
+             data.wifi is number && data.wifi >= 0 && data.wifi <= 100 &&
+             data.network is number && data.network >= 0 &&
+             data.timestamp == request.time;
+    }
+
+    function isValidAlert(data, deviceId) {
+      return hasOnlyAllowedFields(['deviceId', 'type', 'message', 'status', 'timestamp', 'actionTaken']) &&
+             data.deviceId == deviceId &&
+             data.type in ['HIGH_CPU', 'HIGH_MEMORY', 'TREND_OVERLOAD'] &&
+             data.message is string && data.message.size() <= 200 &&
+             data.status in ['pending', 'resolved'] &&
+             data.timestamp == request.time;
+    }
+
+    function isValidCommand(data, deviceId) {
+      return hasOnlyAllowedFields(['deviceId', 'action', 'target', 'status', 'timestamp']) &&
+             data.deviceId == deviceId &&
+             data.action in ['KILL_PROCESS', 'RESTART_SERVICE', 'CLEAN_CACHE', 'STRESS_TEST'] &&
+             data.target is string && data.target.size() <= 50 &&
+             data.status in ['pending', 'done'] &&
+             data.timestamp == request.time;
+    }
+
+    function isValidLog(data, deviceId) {
+      return hasOnlyAllowedFields(['deviceId', 'action', 'result', 'details', 'timestamp']) &&
+             data.deviceId == deviceId &&
+             data.action is string && data.action.size() <= 100 &&
+             data.result in ['success', 'failure'] &&
+             data.details is string && data.details.size() <= 500 &&
+             data.timestamp == request.time;
+    }
+
+    // Rules
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId) && isValidUser(request.resource.data) && 
+                      request.resource.data.role == 'user'; // Force 'user' role on self-creation
+      allow update: if isOwner(userId) && isValidUser(request.resource.data) && 
+                      request.resource.data.role == resource.data.role; // Can't change own role
+      allow update: if isAdmin() && isValidUser(request.resource.data);
+    }
+
+    match /devices/{deviceId} {
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && isValidDevice(request.resource.data) && 
+                      request.resource.data.userId == request.auth.uid;
+      allow update: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin()) && 
+                      isValidDevice(request.resource.data) &&
+                      request.resource.data.userId == resource.data.userId; // Immutable userId
+      allow delete: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+
+      match /metrics/{metricId} {
+        allow read: if isDeviceOwner(deviceId) || isAdmin();
+        allow create: if (isDeviceOwner(deviceId) || isAdmin()) && isValidMetric(request.resource.data, deviceId);
+      }
+
+      match /alerts/{alertId} {
+        allow read: if isDeviceOwner(deviceId) || isAdmin();
+        allow create: if (isDeviceOwner(deviceId) || isAdmin()) && isValidAlert(request.resource.data, deviceId);
+        allow update: if (isDeviceOwner(deviceId) || isAdmin()) && 
+                        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'actionTaken']) &&
+                        request.resource.data.status in ['pending', 'resolved'];
+      }
+
+      match /commands/{commandId} {
+        allow read: if isDeviceOwner(deviceId) || isAdmin();
+        allow create: if (isDeviceOwner(deviceId) || isAdmin()) && isValidCommand(request.resource.data, deviceId);
+        allow update: if (isDeviceOwner(deviceId) || isAdmin()) && 
+                        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']) &&
+                        request.resource.data.status in ['pending', 'done'];
+      }
+
+      match /logs/{logId} {
+        allow read: if isDeviceOwner(deviceId) || isAdmin();
+        allow create: if (isDeviceOwner(deviceId) || isAdmin()) && isValidLog(request.resource.data, deviceId);
+      }
+    }
+  }
+}

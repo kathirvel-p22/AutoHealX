@@ -1,0 +1,38 @@
+// AutoHealX — Firestore Security Rules
+// Deploy via: firebase deploy --only firestore:rules
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Metrics: agent writes, dashboard reads
+    match /metrics/{doc} {
+      allow read: if true;
+      allow write: if true; // Lock down with auth in production
+    }
+
+    // Alerts: agent writes, dashboard reads
+    match /alerts/{doc} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Fix logs: agent writes, dashboard reads
+    match /fixlogs/{doc} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Knowledge base: agent reads/writes
+    match /knowledge/{doc} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Agent status: agent writes, dashboard reads
+    match /agentStatus/{doc} {
+      allow read: if true;
+      allow write: if true;
+    }
+  }
+}
