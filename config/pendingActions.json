@@ -1,0 +1,256 @@
+[
+  {
+    "type": "INTELLIGENT_MEMORY_ACTION",
+    "action": "KILL_TOP_MEMORY_PROCESS",
+    "severity": "warning",
+    "priority": "high",
+    "reason": "Memory at 86.4% and rising - proactive intervention",
+    "impact": "Prevents memory exhaustion",
+    "automated": false,
+    "suggestedAction": "Terminate memory-intensive process",
+    "expectedResult": "Memory usage will decrease by 5-20%",
+    "successRate": 80,
+    "currentValue": 86.4,
+    "threshold": 85,
+    "process": "System",
+    "riskAssessment": {
+      "level": "medium",
+      "factors": [
+        "Memory exhaustion risk",
+        "Rising memory trend"
+      ],
+      "mitigation": "Terminate memory-heavy process"
+    },
+    "confidence": 95,
+    "explanation": "Memory consumption at 86.4% and increasing by 1.5333333333333314%/min. Terminating memory-intensive process prevents system instability and potential data loss.",
+    "preventive": false
+  },
+  {
+    "type": "INTELLIGENT_MEMORY_ACTION",
+    "action": "KILL_TOP_MEMORY_PROCESS",
+    "severity": "warning",
+    "priority": "high",
+    "reason": "Memory at 87.5% and rising - proactive intervention",
+    "impact": "Prevents memory exhaustion",
+    "automated": false,
+    "suggestedAction": "Terminate memory-intensive process",
+    "expectedResult": "Memory usage will decrease by 5-20%",
+    "successRate": 80,
+    "currentValue": 87.5,
+    "threshold": 85,
+    "process": "System",
+    "riskAssessment": {
+      "level": "medium",
+      "factors": [
+        "Memory exhaustion risk",
+        "Rising memory trend"
+      ],
+      "mitigation": "Terminate memory-heavy process"
+    },
+    "confidence": 95,
+    "explanation": "Memory consumption at 87.5% and increasing by 1.0666666666666675%/min. Terminating memory-intensive process prevents system instability and potential data loss.",
+    "preventive": false
+  },
+  {
+    "type": "INTELLIGENT_MEMORY_ACTION",
+    "action": "KILL_TOP_MEMORY_PROCESS",
+    "severity": "warning",
+    "priority": "high",
+    "reason": "Memory at 89.6% and rising - proactive intervention",
+    "impact": "Prevents memory exhaustion",
+    "automated": false,
+    "suggestedAction": "Terminate memory-intensive process",
+    "expectedResult": "Memory usage will decrease by 5-20%",
+    "successRate": 80,
+    "currentValue": 89.6,
+    "threshold": 85,
+    "process": "System",
+    "riskAssessment": {
+      "level": "medium",
+      "factors": [
+        "Memory exhaustion risk",
+        "Rising memory trend"
+      ],
+      "mitigation": "Terminate memory-heavy process"
+    },
+    "confidence": 95,
+    "explanation": "Memory consumption at 89.6% and increasing by 1.2666666666666657%/min. Terminating memory-intensive process prevents system instability and potential data loss.",
+    "preventive": false
+  },
+  {
+    "type": "PATTERN_BASED_ACTION",
+    "action": "MONITOR_INTENSIVE",
+    "severity": "info",
+    "priority": "medium",
+    "reason": "Oscillating CPU pattern detected - enhanced monitoring required",
+    "impact": "Early detection of recurring issues",
+    "automated": true,
+    "suggestedAction": "Enable intensive monitoring",
+    "expectedResult": "Better pattern detection and prevention",
+    "successRate": 90,
+    "currentValue": 71,
+    "threshold": 70,
+    "process": "System Pattern",
+    "riskAssessment": {
+      "level": "low",
+      "factors": [
+        "Pattern anomaly detected"
+      ],
+      "mitigation": "Enhanced monitoring"
+    },
+    "confidence": 95,
+    "explanation": "Detected oscillating CPU pattern. This typically indicates resource contention or background processes. Enhanced monitoring will identify root cause.",
+    "preventive": false
+  },
+  {
+    "type": "INTELLIGENT_MEMORY_ACTION",
+    "action": "KILL_TOP_MEMORY_PROCESS",
+    "severity": "warning",
+    "priority": "high",
+    "reason": "Memory at 91.9% and rising - proactive intervention",
+    "impact": "Prevents memory exhaustion",
+    "automated": false,
+    "suggestedAction": "Terminate memory-intensive process",
+    "expectedResult": "Memory usage will decrease by 5-20%",
+    "successRate": 80,
+    "currentValue": 91.9,
+    "threshold": 85,
+    "process": "System",
+    "riskAssessment": {
+      "level": "medium",
+      "factors": [
+        "Memory exhaustion risk",
+        "Rising memory trend"
+      ],
+      "mitigation": "Terminate memory-heavy process"
+    },
+    "confidence": 95,
+    "explanation": "Memory consumption at 91.9% and increasing by 1.1999999999999982%/min. Terminating memory-intensive process prevents system instability and potential data loss.",
+    "preventive": false
+  },
+  {
+    "type": "PATTERN_BASED_ACTION",
+    "action": "MONITOR_INTENSIVE",
+    "severity": "info",
+    "priority": "medium",
+    "reason": "Oscillating CPU pattern detected - enhanced monitoring required",
+    "impact": "Early detection of recurring issues",
+    "automated": true,
+    "suggestedAction": "Enable intensive monitoring",
+    "expectedResult": "Better pattern detection and prevention",
+    "successRate": 90,
+    "currentValue": 76,
+    "threshold": 70,
+    "process": "System Pattern",
+    "riskAssessment": {
+      "level": "low",
+      "factors": [
+        "Pattern anomaly detected"
+      ],
+      "mitigation": "Enhanced monitoring"
+    },
+    "confidence": 95,
+    "explanation": "Detected oscillating CPU pattern. This typically indicates resource contention or background processes. Enhanced monitoring will identify root cause.",
+    "preventive": false
+  },
+  {
+    "type": "PATTERN_BASED_ACTION",
+    "action": "MONITOR_INTENSIVE",
+    "severity": "info",
+    "priority": "medium",
+    "reason": "Oscillating CPU pattern detected - enhanced monitoring required",
+    "impact": "Early detection of recurring issues",
+    "automated": true,
+    "suggestedAction": "Enable intensive monitoring",
+    "expectedResult": "Better pattern detection and prevention",
+    "successRate": 90,
+    "currentValue": 82,
+    "threshold": 70,
+    "process": "System Pattern",
+    "riskAssessment": {
+      "level": "low",
+      "factors": [
+        "Pattern anomaly detected"
+      ],
+      "mitigation": "Enhanced monitoring"
+    },
+    "confidence": 95,
+    "explanation": "Detected oscillating CPU pattern. This typically indicates resource contention or background processes. Enhanced monitoring will identify root cause.",
+    "preventive": false
+  },
+  {
+    "type": "PATTERN_BASED_ACTION",
+    "action": "MONITOR_INTENSIVE",
+    "severity": "info",
+    "priority": "medium",
+    "reason": "Oscillating CPU pattern detected - enhanced monitoring required",
+    "impact": "Early detection of recurring issues",
+    "automated": true,
+    "suggestedAction": "Enable intensive monitoring",
+    "expectedResult": "Better pattern detection and prevention",
+    "successRate": 90,
+    "currentValue": 74,
+    "threshold": 70,
+    "process": "System Pattern",
+    "riskAssessment": {
+      "level": "low",
+      "factors": [
+        "Pattern anomaly detected"
+      ],
+      "mitigation": "Enhanced monitoring"
+    },
+    "confidence": 95,
+    "explanation": "Detected oscillating CPU pattern. This typically indicates resource contention or background processes. Enhanced monitoring will identify root cause.",
+    "preventive": false
+  },
+  {
+    "type": "PATTERN_BASED_ACTION",
+    "action": "MONITOR_INTENSIVE",
+    "severity": "info",
+    "priority": "medium",
+    "reason": "Oscillating CPU pattern detected - enhanced monitoring required",
+    "impact": "Early detection of recurring issues",
+    "automated": true,
+    "suggestedAction": "Enable intensive monitoring",
+    "expectedResult": "Better pattern detection and prevention",
+    "successRate": 90,
+    "currentValue": 73,
+    "threshold": 70,
+    "process": "System Pattern",
+    "riskAssessment": {
+      "level": "low",
+      "factors": [
+        "Pattern anomaly detected"
+      ],
+      "mitigation": "Enhanced monitoring"
+    },
+    "confidence": 95,
+    "explanation": "Detected oscillating CPU pattern. This typically indicates resource contention or background processes. Enhanced monitoring will identify root cause.",
+    "preventive": false
+  },
+  {
+    "type": "PATTERN_BASED_ACTION",
+    "action": "MONITOR_INTENSIVE",
+    "severity": "info",
+    "priority": "medium",
+    "reason": "Oscillating CPU pattern detected - enhanced monitoring required",
+    "impact": "Early detection of recurring issues",
+    "automated": true,
+    "suggestedAction": "Enable intensive monitoring",
+    "expectedResult": "Better pattern detection and prevention",
+    "successRate": 90,
+    "currentValue": 80,
+    "threshold": 70,
+    "process": "System Pattern",
+    "riskAssessment": {
+      "level": "low",
+      "factors": [
+        "Pattern anomaly detected"
+      ],
+      "mitigation": "Enhanced monitoring"
+    },
+    "confidence": 95,
+    "explanation": "Detected oscillating CPU pattern. This typically indicates resource contention or background processes. Enhanced monitoring will identify root cause.",
+    "preventive": false
+  }
+]
