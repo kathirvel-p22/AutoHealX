@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import * as telemetryService from '../services/telemetryService';
 import { AppError } from '../errors/AppError';
-import { logger } from '../logging/logger';
+import logger from '../logging/logger';
 
 /**
  * POST /api/v1/telemetry
@@ -271,3 +271,4 @@ export default {
   getDetections,
   getStats,
 };
+

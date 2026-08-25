@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { verifyAgentToken, getAgentById } from '../services/agentService';
 import { AppError } from '../errors/AppError';
-import { logger } from '../logging/logger';
+import logger from '../logging/logger';
 
 // Extend Express Request to include agent data
 declare global {
@@ -92,3 +92,4 @@ export function requireAgentOrganization(organizationId: string) {
 }
 
 export default authenticateAgent;
+

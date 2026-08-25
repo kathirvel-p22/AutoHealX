@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import * as agentService from '../services/agentService';
 import { AppError } from '../errors/AppError';
-import { logger } from '../logging/logger';
+import logger from '../logging/logger';
 
 /**
  * POST /api/v1/agents/register
@@ -322,3 +322,4 @@ export default {
   heartbeat,
   getHealth,
 };
+
