@@ -7,7 +7,7 @@ import logger from '../logging/logger';
  * Enforce tenant isolation - ensure organization_id in request matches user's organization
  * Use this middleware on routes that accept organization_id in params or body
  */
-export function enforceTenantIsolation(req: Request, res: Response, next: NextFunction): void {
+export function enforceTenantIsolation(req: Request, _res: Response, next: NextFunction): void {
   try {
     const authReq = req as AuthenticatedRequest;
     

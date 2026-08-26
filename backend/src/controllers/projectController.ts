@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express';
-import { AuthenticatedRequest } from '../middleware/authenticate';
 import { Project, Service } from '../models';
 import { AppError } from '../errors/AppError';
 

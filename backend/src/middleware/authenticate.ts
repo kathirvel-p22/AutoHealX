@@ -14,7 +14,7 @@ export interface AuthenticatedRequest extends Request {
 /**
  * Authenticate JWT token from Authorization header
  */
-export function authenticate(req: Request, res: Response, next: NextFunction): void {
+export function authenticate(req: Request, _res: Response, next: NextFunction): void {
   try {
     const authHeader = req.headers.authorization;
     

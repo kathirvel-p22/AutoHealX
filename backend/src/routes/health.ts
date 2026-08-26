@@ -6,7 +6,7 @@ const router = Router();
 /**
  * GET /health - Basic health check
  */
-router.get('/', (req: Request, res: Response) => {
+router.get('/', (_req: Request, res: Response) => {
   res.status(200).json({
     success: true,
     status: 'healthy',
@@ -18,7 +18,7 @@ router.get('/', (req: Request, res: Response) => {
 /**
  * GET /ready - Readiness check (includes database)
  */
-router.get('/ready', async (req: Request, res: Response) => {
+router.get('/ready', async (_req: Request, res: Response) => {
   try {
     // Test database connection
     await sequelize.authenticate();

@@ -1,12 +1,12 @@
 import crypto from 'crypto';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { Agent } from '../models/Agent';
-import { AgentCredential } from '../models/AgentCredential';
-import { AgentHeartbeat } from '../models/AgentHeartbeat';
+import Agent from '../models/Agent';
+import AgentCredential from '../models/AgentCredential';
+import AgentHeartbeat from '../models/AgentHeartbeat';
 import { serverConfig } from '../config/server';
 import { AppError } from '../errors/AppError';
-import { logger } from '../logging/logger';
+import logger from '../logging/logger';
 
 // Constants
 const BCRYPT_ROUNDS = 12;
@@ -61,14 +61,16 @@ export async function registerAgent(data: AgentRegistrationData): Promise<{ agen
 
   // Create agent record
   const agent = await Agent.create({
-    organizationId: data.organizationId,
+    organization_id: data.organizationId,
     name: data.name,
     hostname: data.hostname,
-    platform: data.platform,
+    platform: data.platform as 'windows' | 'linux' | 'darwin',
     version: data.version,
-    capabilities: data.capabilities || [],
     status: 'pending',
-    metadata: data.metadata || {},
+    metadata: {
+      capabilities: data.capabilities || [],
+      ...(data.metadata || {})
+    },
   });
 
   // Generate API key
@@ -81,10 +83,9 @@ export async function registerAgent(data: AgentRegistrationData): Promise<{ agen
 
   // Create credential record
   await AgentCredential.create({
-    agentId: agent.id,
-    apiKeyHash,
-    name: 'default',
-    expiresAt,
+    agent_id: agent.id,
+    api_key_hash: apiKeyHash,
+    expires_at: expiresAt,
   });
 
   logger.info(`Agent registered successfully: ${agent.id}`);
@@ -100,45 +101,47 @@ export async function registerAgent(data: AgentRegistrationData): Promise<{ agen
  * Authenticate agent with API key and return JWT token
  */
 export async function authenticateAgent(apiKey: string): Promise<{ token: string; agent: Agent }> {
-  // Find all non-revoked credentials (we need to check all since we don't know which agent)
-  const credentials = await AgentCredential.findAll({
-    where: {
-      revokedAt: null,
-    },
-    include: [
-      {
-        model: Agent,
-        as: 'agent',
-        where: {
-          status: 'active',
-        },
-      },
-    ],
-  });
+  // Find all credentials and filter non-revoked in memory
+  const credentials = await AgentCredential.findAll();
 
   // Try to match the API key
   for (const credential of credentials) {
-    const isValid = await verifyApiKey(apiKey, credential.apiKeyHash);
+    // Skip revoked credentials
+    if (credential.revoked_at) {
+      continue;
+    }
+
+    const isValid = await verifyApiKey(apiKey, credential.api_key_hash);
 
     if (isValid) {
       // Check expiry
-      if (credential.expiresAt && credential.expiresAt < new Date()) {
+      if (credential.expires_at && credential.expires_at < new Date()) {
         throw new AppError('API key expired', 401);
       }
 
-      // Update last used timestamp
-      await credential.update({ lastUsedAt: new Date() });
+      // Get the associated agent
+      const agent = await Agent.findOne({
+        where: {
+          id: credential.agent_id,
+          status: 'active',
+        },
+      });
 
-      const agent = credential.agent as Agent;
+      if (!agent) {
+        continue; // Try next credential
+      }
+
+      // Update last used timestamp
+      await credential.update({ last_used_at: new Date() });
 
       // Generate JWT token
       const payload: AgentTokenPayload = {
         agentId: agent.id,
-        organizationId: agent.organizationId,
+        organizationId: agent.organization_id,
         type: 'agent',
       };
 
-      const token = jwt.sign(payload, serverConfig.jwtSecret, {
+      const token = jwt.sign(payload, serverConfig.jwt.secret, {
         expiresIn: AGENT_JWT_EXPIRY,
       });
 
@@ -157,7 +160,7 @@ export async function authenticateAgent(apiKey: string): Promise<{ token: string
  */
 export async function verifyAgentToken(token: string): Promise<AgentTokenPayload> {
   try {
-    const payload = jwt.verify(token, serverConfig.jwtSecret) as AgentTokenPayload;
+    const payload = jwt.verify(token, serverConfig.jwt.secret) as AgentTokenPayload;
 
     if (payload.type !== 'agent') {
       throw new AppError('Invalid token type', 401);
@@ -192,7 +195,7 @@ export async function listAgents(organizationId: string, filters?: {
   status?: string;
   platform?: string;
 }): Promise<Agent[]> {
-  const where: any = { organizationId };
+  const where: any = { organization_id: organizationId };
 
   if (filters?.status) {
     where.status = filters.status;
@@ -204,7 +207,7 @@ export async function listAgents(organizationId: string, filters?: {
 
   return Agent.findAll({
     where,
-    order: [['createdAt', 'DESC']],
+    order: [['created_at', 'DESC']],
   });
 }
 
@@ -235,8 +238,8 @@ export async function revokeAgent(agentId: string): Promise<void> {
 
   // Revoke all credentials
   await AgentCredential.update(
-    { revokedAt: new Date() },
-    { where: { agentId } }
+    { revoked_at: new Date() },
+    { where: { agent_id: agentId } }
   );
 
   logger.warn(`Agent revoked: ${agentId} (${agent.name})`);
@@ -245,13 +248,18 @@ export async function revokeAgent(agentId: string): Promise<void> {
 /**
  * Rotate agent API key (revoke old, create new)
  */
-export async function rotateApiKey(agentId: string, oldKeyName: string = 'default'): Promise<string> {
+export async function rotateApiKey(agentId: string): Promise<string> {
   const agent = await getAgentById(agentId);
+  
+  // Verify agent exists (getAgentById throws if not found)
+  if (!agent) {
+    throw new Error('Agent not found');
+  }
 
   // Revoke old credential
   await AgentCredential.update(
-    { revokedAt: new Date() },
-    { where: { agentId, name: oldKeyName } }
+    { revoked_at: new Date() },
+    { where: { agent_id: agentId } }
   );
 
   // Generate new API key
@@ -264,10 +272,9 @@ export async function rotateApiKey(agentId: string, oldKeyName: string = 'defaul
 
   // Create new credential
   await AgentCredential.create({
-    agentId,
-    apiKeyHash,
-    name: `${oldKeyName}-rotated-${Date.now()}`,
-    expiresAt,
+    agent_id: agentId,
+    api_key_hash: apiKeyHash,
+    expires_at: expiresAt,
   });
 
   logger.info(`API key rotated for agent: ${agentId}`);
@@ -289,15 +296,23 @@ export async function recordHeartbeat(
   }
 ): Promise<AgentHeartbeat> {
   const heartbeat = await AgentHeartbeat.create({
-    agentId,
-    status: data.status,
-    cpuUsage: data.cpuUsage,
-    memoryUsage: data.memoryUsage,
-    processCount: data.processCount,
-    metadata: data.metadata || {},
+    agent_id: agentId,
+    status: data.status === 'online' ? 'healthy' : data.status === 'degraded' ? 'degraded' : 'unhealthy',
+    metrics: {
+      cpuUsage: data.cpuUsage,
+      memoryUsage: data.memoryUsage,
+      processCount: data.processCount,
+      ...(data.metadata || {})
+    },
+    services_count: 0,
+    incidents_count: 0,
   });
 
-  // Note: Database trigger will automatically update agent.lastHeartbeat
+  // Update agent last_heartbeat_at
+  await Agent.update(
+    { last_heartbeat_at: new Date() },
+    { where: { id: agentId } }
+  );
 
   return heartbeat;
 }
@@ -308,12 +323,12 @@ export async function recordHeartbeat(
 export async function isAgentOnline(agentId: string): Promise<boolean> {
   const agent = await getAgentById(agentId);
 
-  if (!agent.lastHeartbeat) {
+  if (!agent.last_heartbeat_at) {
     return false;
   }
 
   const twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000);
-  return agent.lastHeartbeat >= twoMinutesAgo;
+  return agent.last_heartbeat_at >= twoMinutesAgo;
 }
 
 /**
@@ -324,8 +339,8 @@ export async function getAgentHealthHistory(
   limit: number = 100
 ): Promise<AgentHeartbeat[]> {
   return AgentHeartbeat.findAll({
-    where: { agentId },
-    order: [['createdAt', 'DESC']],
+    where: { agent_id: agentId },
+    order: [['timestamp', 'DESC']],
     limit,
   });
 }

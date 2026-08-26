@@ -130,7 +130,7 @@ export class AuthService {
         include: [{ model: Role, as: 'role' }]
       });
 
-      if (!member || !member.role) {
+      if (!member || !(member as any).role) {
         throw new AppError('User role not found', 500);
       }
 
@@ -147,7 +147,7 @@ export class AuthService {
 
       logger.info(`User logged in: ${user.email}`);
 
-      return { user, tokens, role: member.role };
+      return { user, tokens, role: (member as any).role };
     } catch (error) {
       logger.error('Login error:', error);
       throw error;
@@ -158,14 +158,14 @@ export class AuthService {
    * Generate access and refresh tokens
    */
   static generateTokens(payload: TokenPayload): AuthTokens {
-    const accessToken = jwt.sign(payload, serverConfig.jwt.secret, {
-      expiresIn: serverConfig.jwt.expiry
-    });
+    const accessToken = jwt.sign(payload, serverConfig.jwt.secret as string, {
+      expiresIn: serverConfig.jwt.expiry as string
+    } as jwt.SignOptions);
 
     const refreshToken = jwt.sign(
       { userId: payload.userId },
-      serverConfig.jwt.refreshSecret,
-      { expiresIn: serverConfig.jwt.refreshExpiry }
+      serverConfig.jwt.refreshSecret as string,
+      { expiresIn: serverConfig.jwt.refreshExpiry as string } as jwt.SignOptions
     );
 
     return {

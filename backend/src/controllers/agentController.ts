@@ -33,14 +33,14 @@ export async function register(req: Request, res: Response): Promise<void> {
     res.status(201).json({
       agent: {
         id: agent.id,
-        organizationId: agent.organizationId,
+        organizationId: agent.organization_id,
         name: agent.name,
         hostname: agent.hostname,
         platform: agent.platform,
         version: agent.version,
-        capabilities: agent.capabilities,
+        capabilities: agent.metadata?.capabilities,
         status: agent.status,
-        createdAt: agent.createdAt,
+        createdAt: agent.created_at,
       },
       apiKey, // ⚠️ CRITICAL: Store this securely, it won't be shown again
       message: 'Agent registered successfully. Store the API key securely - it cannot be retrieved later.',
@@ -76,7 +76,7 @@ export async function authenticate(req: Request, res: Response): Promise<void> {
       agent: {
         id: agent.id,
         name: agent.name,
-        organizationId: agent.organizationId,
+        organizationId: agent.organization_id,
       },
     });
   } catch (error) {
@@ -111,8 +111,8 @@ export async function list(req: Request, res: Response): Promise<void> {
         platform: agent.platform,
         version: agent.version,
         status: agent.status,
-        lastHeartbeat: agent.lastHeartbeat,
-        createdAt: agent.createdAt,
+        lastHeartbeat: agent.last_heartbeat_at,
+        createdAt: agent.created_at,
       })),
       total: agents.length,
     });
@@ -135,17 +135,17 @@ export async function get(req: Request, res: Response): Promise<void> {
     res.json({
       agent: {
         id: agent.id,
-        organizationId: agent.organizationId,
+        organizationId: agent.organization_id,
         name: agent.name,
         hostname: agent.hostname,
         platform: agent.platform,
         version: agent.version,
-        capabilities: agent.capabilities,
+        capabilities: agent.metadata?.capabilities,
         status: agent.status,
-        lastHeartbeat: agent.lastHeartbeat,
+        lastHeartbeat: agent.last_heartbeat_at,
         metadata: agent.metadata,
-        createdAt: agent.createdAt,
-        updatedAt: agent.updatedAt,
+        createdAt: agent.created_at,
+        updatedAt: agent.updated_at,
       },
     });
   } catch (error) {
@@ -177,7 +177,7 @@ export async function updateStatus(req: Request, res: Response): Promise<void> {
       agent: {
         id: agent.id,
         status: agent.status,
-        updatedAt: agent.updatedAt,
+        updatedAt: agent.updated_at,
       },
       message: `Agent status updated to ${status}`,
     });
@@ -295,10 +295,10 @@ export async function getHealth(req: Request, res: Response): Promise<void> {
       isOnline,
       history: history.map(h => ({
         status: h.status,
-        cpuUsage: h.cpuUsage,
-        memoryUsage: h.memoryUsage,
-        processCount: h.processCount,
-        timestamp: h.createdAt,
+        cpuUsage: (h.metrics as any)?.cpuUsage,
+        memoryUsage: (h.metrics as any)?.memoryUsage,
+        processCount: (h.metrics as any)?.processCount,
+        timestamp: h.timestamp,
       })),
     });
   } catch (error) {

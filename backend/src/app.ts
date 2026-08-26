@@ -67,7 +67,7 @@ app.use(`/api/${serverConfig.apiVersion}/agents`, agentRoutes);
 app.use(`/api/${serverConfig.apiVersion}/telemetry`, telemetryRoutes);
 
 // Root endpoint
-app.get('/', (req, res) => {
+app.get('/', (_req, res) => {
   res.json({
     service: 'AutoHealX Backend',
     version: serverConfig.apiVersion,

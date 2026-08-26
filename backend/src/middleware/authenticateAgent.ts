@@ -3,20 +3,6 @@ import { verifyAgentToken, getAgentById } from '../services/agentService';
 import { AppError } from '../errors/AppError';
 import logger from '../logging/logger';
 
-// Extend Express Request to include agent data
-declare global {
-  namespace Express {
-    interface Request {
-      agent?: {
-        id: string;
-        organizationId: string;
-        name?: string;
-        hostname?: string;
-      };
-    }
-  }
-}
-
 /**
  * Middleware to authenticate agent requests via JWT token
  * Expects: Authorization: Bearer <token>
@@ -42,11 +28,7 @@ export async function authenticateAgent(
     // Get agent details
     const agent = await getAgentById(payload.agentId);
 
-    // Check agent status
-    if (agent.status === 'revoked') {
-      throw new AppError('Agent has been revoked', 403);
-    }
-
+    // Check agent status (inactive agents can't authenticate)
     if (agent.status === 'inactive') {
       throw new AppError('Agent is inactive', 403);
     }
@@ -54,7 +36,7 @@ export async function authenticateAgent(
     // Attach agent info to request
     req.agent = {
       id: agent.id,
-      organizationId: agent.organizationId,
+      organizationId: agent.organization_id,
       name: agent.name,
       hostname: agent.hostname,
     };

@@ -10,7 +10,7 @@ export function errorHandler(
   error: Error | AppError,
   req: Request,
   res: Response,
-  next: NextFunction
+  _next: NextFunction
 ): void {
   // Log error (never log sensitive data)
   logger.error('Error occurred:', {

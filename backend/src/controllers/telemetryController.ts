@@ -116,12 +116,12 @@ export async function query(req: Request, res: Response): Promise<void> {
     res.json({
       events: events.map(e => ({
         id: e.id,
-        agentId: e.agentId,
-        serviceId: e.serviceId,
-        eventType: e.eventType,
+        agentId: e.agent_id,
+        serviceId: e.metadata?.serviceId,
+        eventType: e.event_type,
         timestamp: e.timestamp,
-        data: e.data,
-        createdAt: e.createdAt,
+        data: e.metadata,
+        createdAt: e.created_at,
       })),
       total: events.length,
     });
@@ -168,11 +168,11 @@ export async function recordDetection(req: Request, res: Response): Promise<void
     res.status(201).json({
       detection: {
         id: detection.id,
-        detectionType: detection.detectionType,
+        detectionType: detection.detection_type,
         severity: detection.severity,
         confidence: detection.confidence,
         message: detection.message,
-        detectedAt: detection.detectedAt,
+        detectedAt: detection.detected_at,
       },
       message: 'Detection recorded',
     });
@@ -206,15 +206,15 @@ export async function getDetections(req: Request, res: Response): Promise<void> 
     res.json({
       detections: detections.map(d => ({
         id: d.id,
-        agentId: d.agentId,
-        serviceId: d.serviceId,
-        detectionType: d.detectionType,
+        agentId: d.agent_id,
+        serviceId: d.metadata?.serviceId,
+        detectionType: d.detection_type,
         severity: d.severity,
         confidence: d.confidence,
         message: d.message,
-        suggestedAction: d.suggestedAction,
-        detectedAt: d.detectedAt,
-        createdAt: d.createdAt,
+        suggestedAction: d.suggested_action,
+        detectedAt: d.detected_at,
+        createdAt: d.created_at,
       })),
       total: detections.length,
     });

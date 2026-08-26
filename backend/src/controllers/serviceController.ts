@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express';
-import { AuthenticatedRequest } from '../middleware/authenticate';
 import { Service, Project, Incident } from '../models';
 import { AppError } from '../errors/AppError';
 
@@ -239,9 +238,9 @@ export class ServiceController {
         throw new AppError('Service not found', 404);
       }
 
-      const incidents = service.incidents || [];
-      const criticalCount = incidents.filter(i => i.severity === 'critical').length;
-      const highCount = incidents.filter(i => i.severity === 'high').length;
+      const incidents = (service as any).incidents || [];
+      const criticalCount = incidents.filter((i: any) => i.severity === 'critical').length;
+      const highCount = incidents.filter((i: any) => i.severity === 'high').length;
 
       res.status(200).json({
         success: true,

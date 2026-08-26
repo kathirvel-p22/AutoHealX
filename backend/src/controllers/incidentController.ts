@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from 'express';
 import { AuthenticatedRequest } from '../middleware/authenticate';
 import { Incident, IncidentEvent, Service, Project } from '../models';
 import { AppError } from '../errors/AppError';
-import { Op } from 'sequelize';
 import sequelize from '../config/database';
 
 // Valid status transitions

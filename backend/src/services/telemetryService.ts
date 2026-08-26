@@ -1,8 +1,8 @@
-import { TelemetryEvent } from '../models/TelemetryEvent';
-import { DetectionResult } from '../models/DetectionResult';
-import { Agent } from '../models/Agent';
+import TelemetryEvent from '../models/TelemetryEvent';
+import DetectionResult from '../models/DetectionResult';
+import Agent from '../models/Agent';
 import { AppError } from '../errors/AppError';
-import { logger } from '../logging/logger';
+import logger from '../logging/logger';
 import { Op } from 'sequelize';
 
 // Interface for telemetry ingestion
@@ -45,18 +45,20 @@ export async function ingestTelemetry(data: TelemetryData): Promise<TelemetryEve
   }
 
   // Verify organization match (tenant isolation)
-  if (agent.organizationId !== data.organizationId) {
+  if (agent.organization_id !== data.organizationId) {
     throw new AppError('Organization mismatch', 403);
   }
 
   // Create telemetry event
   const event = await TelemetryEvent.create({
-    organizationId: data.organizationId,
-    agentId: data.agentId,
-    serviceId: data.serviceId,
-    eventType: data.eventType,
+    organization_id: data.organizationId,
+    agent_id: data.agentId,
+    event_type: data.eventType,
     timestamp: data.timestamp,
-    data: data.data,
+    metadata: {
+      serviceId: data.serviceId,
+      ...data.data
+    },
   });
 
   logger.debug(`Telemetry ingested: ${data.eventType} from agent ${data.agentId}`);
@@ -83,19 +85,21 @@ export async function batchIngestTelemetry(events: TelemetryData[]): Promise<num
   // Validate agent
   const agent = await Agent.findByPk(agentId);
   
-  if (!agent || agent.status !== 'active' || agent.organizationId !== organizationId) {
+  if (!agent || agent.status !== 'active' || agent.organization_id !== organizationId) {
     throw new AppError('Invalid agent', 403);
   }
 
   // Bulk create
   await TelemetryEvent.bulkCreate(
     events.map(e => ({
-      organizationId: e.organizationId,
-      agentId: e.agentId,
-      serviceId: e.serviceId,
-      eventType: e.eventType,
+      organization_id: e.organizationId,
+      agent_id: e.agentId,
+      event_type: e.eventType,
       timestamp: e.timestamp,
-      data: e.data,
+      metadata: {
+        serviceId: e.serviceId,
+        ...e.data
+      },
     }))
   );
 
@@ -117,19 +121,15 @@ export async function queryTelemetry(filters: {
   limit?: number;
 }): Promise<TelemetryEvent[]> {
   const where: any = {
-    organizationId: filters.organizationId,
+    organization_id: filters.organizationId,
   };
 
   if (filters.agentId) {
-    where.agentId = filters.agentId;
-  }
-
-  if (filters.serviceId) {
-    where.serviceId = filters.serviceId;
+    where.agent_id = filters.agentId;
   }
 
   if (filters.eventType) {
-    where.eventType = filters.eventType;
+    where.event_type = filters.eventType;
   }
 
   if (filters.startTime || filters.endTime) {
@@ -165,7 +165,7 @@ export async function recordDetection(data: DetectionData): Promise<DetectionRes
   }
 
   // Verify organization match
-  if (agent.organizationId !== data.organizationId) {
+  if (agent.organization_id !== data.organizationId) {
     throw new AppError('Organization mismatch', 403);
   }
 
@@ -176,17 +176,19 @@ export async function recordDetection(data: DetectionData): Promise<DetectionRes
 
   // Create detection result
   const detection = await DetectionResult.create({
-    organizationId: data.organizationId,
-    agentId: data.agentId,
-    serviceId: data.serviceId,
-    detectionType: data.detectionType,
+    organization_id: data.organizationId,
+    agent_id: data.agentId,
+    incident_id: undefined,
+    detection_type: data.detectionType,
     severity: data.severity,
     confidence: data.confidence,
     message: data.message,
-    suggestedAction: data.suggestedAction,
-    metadata: data.metadata || {},
-    processed: false,
-    detectedAt: data.detectedAt,
+    suggested_action: data.suggestedAction,
+    metadata: {
+      serviceId: data.serviceId,
+      ...(data.metadata || {})
+    },
+    detected_at: data.detectedAt,
   });
 
   logger.info(`Detection recorded: ${data.detectionType} (${data.severity}) from agent ${data.agentId}`);
@@ -201,14 +203,15 @@ export async function recordDetection(data: DetectionData): Promise<DetectionRes
  * Get unprocessed detections for incident creation
  */
 export async function getUnprocessedDetections(organizationId: string, limit: number = 100): Promise<DetectionResult[]> {
-  return DetectionResult.findAll({
+  const allDetections = await DetectionResult.findAll({
     where: {
-      organizationId,
-      processed: false,
+      organization_id: organizationId,
     },
-    order: [['detectedAt', 'ASC']],
-    limit,
+    order: [['detected_at', 'ASC']],
   });
+
+  // Filter for unprocessed (no incident_id) in memory
+  return allDetections.filter(d => !d.incident_id).slice(0, limit);
 }
 
 /**
@@ -217,8 +220,7 @@ export async function getUnprocessedDetections(organizationId: string, limit: nu
 export async function markDetectionProcessed(detectionId: string, incidentId?: string): Promise<void> {
   await DetectionResult.update(
     {
-      processed: true,
-      incidentId,
+      incident_id: incidentId,
     },
     {
       where: { id: detectionId },
@@ -242,12 +244,12 @@ export async function getDetectionStats(organizationId: string, hours: number = 
 
   const detections = await DetectionResult.findAll({
     where: {
-      organizationId,
-      detectedAt: {
+      organization_id: organizationId,
+      detected_at: {
         [Op.gte]: since,
       },
     },
-    attributes: ['severity', 'detectionType', 'processed'],
+    attributes: ['severity', 'detection_type', 'incident_id'],
   });
 
   const stats = {
@@ -263,10 +265,10 @@ export async function getDetectionStats(organizationId: string, hours: number = 
     stats.bySeverity[detection.severity] = (stats.bySeverity[detection.severity] || 0) + 1;
 
     // Count by type
-    stats.byType[detection.detectionType] = (stats.byType[detection.detectionType] || 0) + 1;
+    stats.byType[detection.detection_type] = (stats.byType[detection.detection_type] || 0) + 1;
 
     // Count processed/unprocessed
-    if (detection.processed) {
+    if (detection.incident_id) {
       stats.processed++;
     } else {
       stats.unprocessed++;
@@ -288,12 +290,12 @@ export async function getTelemetryStats(organizationId: string, hours: number = 
 
   const events = await TelemetryEvent.findAll({
     where: {
-      organizationId,
+      organization_id: organizationId,
       timestamp: {
         [Op.gte]: since,
       },
     },
-    attributes: ['eventType', 'agentId'],
+    attributes: ['event_type', 'agent_id'],
   });
 
   const stats = {
@@ -303,8 +305,8 @@ export async function getTelemetryStats(organizationId: string, hours: number = 
   };
 
   for (const event of events) {
-    stats.byEventType[event.eventType] = (stats.byEventType[event.eventType] || 0) + 1;
-    stats.byAgent[event.agentId] = (stats.byAgent[event.agentId] || 0) + 1;
+    stats.byEventType[event.event_type] = (stats.byEventType[event.event_type] || 0) + 1;
+    stats.byAgent[event.agent_id] = (stats.byAgent[event.agent_id] || 0) + 1;
   }
 
   return stats;

@@ -1,5 +1,5 @@
 import { Model, DataTypes, Optional } from 'sequelize';
-import { sequelize } from '../config/database';
+import sequelize from '../config/database';
 
 interface AgentAttributes {
   id: string;
@@ -8,7 +8,7 @@ interface AgentAttributes {
   hostname: string;
   platform: 'windows' | 'linux' | 'darwin';
   version: string;
-  status: 'active' | 'inactive' | 'suspended';
+  status: 'pending' | 'active' | 'inactive' | 'suspended' | 'revoked';
   last_heartbeat_at?: Date;
   metadata: Record<string, any>;
   created_at: Date;
@@ -24,7 +24,7 @@ class Agent extends Model<AgentAttributes, AgentCreationAttributes> implements A
   declare hostname: string;
   declare platform: 'windows' | 'linux' | 'darwin';
   declare version: string;
-  declare status: 'active' | 'inactive' | 'suspended';
+  declare status: 'pending' | 'active' | 'inactive' | 'suspended' | 'revoked';
   declare last_heartbeat_at: Date | undefined;
   declare metadata: Record<string, any>;
   declare readonly created_at: Date;
@@ -68,9 +68,9 @@ Agent.init(
     status: {
       type: DataTypes.STRING(50),
       allowNull: false,
-      defaultValue: 'active',
+      defaultValue: 'pending',
       validate: {
-        isIn: [['active', 'inactive', 'suspended']]
+        isIn: [['pending', 'active', 'inactive', 'suspended', 'revoked']]
       }
     },
     last_heartbeat_at: {
